@@ -1,0 +1,151 @@
+    Spring Security                               Slides  Lab    Project                       ~Time
+=======================================================================================================
+--- Day 1:
+1.  Course Introduction                             11    -
+2.  Introduction to Security                        36    Lab1   00-rewards-common              15m
+3.  Spring Security Basics                          45    Lab2   20-security-basics             20m
+4.  Customizing Authentication                      47    Lab3   30-authentication              50m
+5.  Securing Web Applications                       44    Lab4   40-authorization               40m
+6.  Method Security                                 29    Lab5   41-method-security             15m
+
+--- Day 2:
+7.  Security Testing                                37    Lab6   50-security-testing            30m
+8.  Managing Passwords                              33    Lab7   60-password-handling           25m
+9.  ^Protecting Against Common Vulnerabilities      35    -
+10. OAuth2 & OIDC Concepts                          51    Lab8   70-oauth2-login                30m
+11. Spring Authorization Server                     35    Lab9   80-authorization-server        35m
+12. Protecting & Accessing Resources with OAuth2    41    Lab10  90-resource-server             50m
+                                                                 90-reward-dashboard
+                                                                 80-authorization-server-solution
+=======================================================================================================
+
+
+
+References
+=======================================================================================================
+#03-40  https://docs.spring.io/spring-security/reference/5.8/migration/servlet/config.html#use-new-requestmatchers
+#05-20  https://docs.spring.io/spring-security/reference/5.8/servlet/authorization/expression-based.html
+#07-33  https://docs.spring.io/spring-security/reference/servlet/test/mockmvc/result-handlers.html#_exporting_the_securitycontext
+#10-27  https://darutk.medium.com/diagrams-and-movies-of-all-the-oauth-2-0-flows-194f3c3ade85
+=======================================================================================================
+
+
+
+Lab User Roles
+=======================================================================================================
+1  Keith       USER       
+2  Dollie      MANAGER    Owner:Restaurant:1
+3  Cornelia    MANAGER    Owner:Restaurant:2
+5  Chad        ADMIN
+=======================================================================================================
+
+
+
+Lab Ports  (+1 for lab-solution)
+=======================================================================================================
+8080  Rewards application
+9090  OAuth2 Authorization Server
+8080  OAuth2 Resource Server
+8082  OAuth2 Client (Reward-Dashboard)
+=======================================================================================================
+
+
+
+Lab Corrections
+=======================================================================================================
+Lab 1:
+======
+    Task 4: You can't start application with project 00-rewards-common, we will run app in next lab with 20-security-basics
+
+
+Lab 2:
+======
+    Task 2.2: Change SpringIntroApplication -> SecurityIntroApplication
+
+
+Lab 4:
+======
+    Task 1.2.c: For Windows, remove whitespace between "name":"AppleBeans", "location":"New York"
+
+       i.e. curl -v -X PUT -H "Content-Type: application/json" -d '{"name":"AppleBeans","location":"New York","benefitPercentage":0.09}' -u keith:spring http://localhost:8080/restaurants/1
+       
+       => alternatively, use PostMan or WSL curl
+
+
+    Task 4.5.b: curl on Windows return response 400 instead of expected 204:
+
+       {"timestamp":"2023-11-27T15:55:15.719+00:00","status":400,"error":"Bad Request","trace":"org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Unexpected character (''' (code 39)): expected a valid value (JSON String, Number, Array, Object or token 'null', 'true' or 'false');.....
+      
+       => use PostMan or WSL curl
+
+
+    Tasks 7-10: skip these optional tasks, which are not covered in slides.
+
+       Task 8.3: Change SecurityManager to SecurityUtils
+  
+       Task 10: JUnit test failed
+
+
+Lab 7:
+======
+    Task 4.3 & 4.4.b: no need for PasswordEncoder, new password is already encoded.
+
+
+Lab 8:
+======
+    Task 5.2: Change "load" method to "loadUser"
+
+
+Lab 9:
+======
+    Task 3.2: clientSecret must be encoded (solution is wrong: no encoding), otherwise failure will occur in Task 5.3: 
+  
+      java.lang.IllegalArgumentException: There is no PasswordEncoder mapped for the id "null"
+    
+=======================================================================================================
+
+
+
+
+
+Spring Boot Testing
+=======================================================================================================
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment=WebEnvironment.DEFINED_PORT)
+
+    -> tests call HTTP to embedded web server 
+    -> use TestRestTemplate
+    -> data payload is POJO (RestTemplate has message converters)
+
+
+@SpringBootTest(webEnvironment=WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+
+    -> use @WebMvcTest instead
+    -> tests call DispatcherServlet without web server 
+    -> use MockMvc
+    -> data payload is JSON/XML (no message converters)
+
+
+@MockBean -> mock Spring Bean  (Spring  annotation)
+@Mock     -> mock POJO         (Mockito annotation)
+=======================================================================================================
+
+
+
+
+
+Layer               ClassName               Annotation
+=======================================================================================================
+Web                 AccountController       @RestController,@Controller
+Service             AccountService          @Service       (@Transactional,@PreAuthorize)
+Repository          AccountRepository       @Repository    (injects JdbcTemplate)
+Infrastructure      DataSource              -
+
+Domain Object       Account                 POJO (SpringData:@Entity,@Id)
+
+Config Class        AppConfig,InfraConfig   @Configuration
+Main Class          ???Application          @SpringBootApplication
+=======================================================================================================
+
+
