@@ -37,7 +37,7 @@ public class DashboardController {
 	public @ResponseBody Mono<String> rewards() {
 		return webClient
 		        .get()
-		        .uri("TODO")
+		        .uri(rewardsDiningBaseUrl + "/rewards")
 		        .retrieve()
 		        .onStatus(
 		                s -> s.equals(HttpStatus.UNAUTHORIZED),
@@ -49,13 +49,13 @@ public class DashboardController {
 	}
 	
 	@GetMapping("/user-info")  
-    public String userInfo(Model model) {
-        model.addAttribute("username", null);
-        model.addAttribute("idToken", null);
-        model.addAttribute("userAttributes", null);
+    public String userInfo(Model model, @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient auth2AuthorizedClient, @AuthenticationPrincipal OidcUser oidcUser) {
+        model.addAttribute("username", oidcUser.getName());
+        model.addAttribute("idToken", oidcUser.getIdToken());
+        model.addAttribute("userAttributes", oidcUser.getAttributes());
         
-        model.addAttribute("accessToken", null);  
-        model.addAttribute("refreshToken", null);
+        model.addAttribute("accessToken", auth2AuthorizedClient.getAccessToken().getTokenValue());
+        model.addAttribute("refreshToken", auth2AuthorizedClient.getRefreshToken().getTokenValue());
         
         return "user-info";  
     }	

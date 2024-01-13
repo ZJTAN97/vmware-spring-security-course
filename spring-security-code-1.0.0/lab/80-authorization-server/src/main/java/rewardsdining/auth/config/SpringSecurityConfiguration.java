@@ -6,6 +6,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
  
 @EnableWebSecurity
@@ -27,4 +31,23 @@ public class SpringSecurityConfiguration {
 				.requestMatchers(PathRequest.toStaticResources().atCommonLocations())
 				.antMatchers("/h2-console/**");
 	}
+
+
+	@Bean
+	public UserDetailsService userDetailsService() {
+
+		UserDetails keith = User.withDefaultPasswordEncoder()
+				.username("keith")
+				.password("spring")
+				.roles("USER").build();
+
+		UserDetails chad = User.withDefaultPasswordEncoder()
+				.username("chad")
+				.password("spring")
+				.roles("USER", "ADMIN").build();
+
+		return new InMemoryUserDetailsManager(keith, chad);
+	}
+
+
 }

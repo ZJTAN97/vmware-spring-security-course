@@ -3,8 +3,10 @@ package rewardsdining.restaurant;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rewardsdining.security.IsOwner;
 
 @Service
 @Transactional
@@ -26,7 +28,8 @@ public class RestaurantManager {
 	public List<Restaurant> findAll() {
 		return restaurantRepository.findAll();
 	}
-	
+
+	@IsOwner
 	public Restaurant save(Restaurant restaurant) {
 		return restaurantRepository.save(restaurant);
 	}

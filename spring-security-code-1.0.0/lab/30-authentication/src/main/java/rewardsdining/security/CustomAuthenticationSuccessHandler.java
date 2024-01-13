@@ -11,7 +11,10 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 	@Override
 	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) {
-		
-		return null;
+
+
+		var authorities = SecurityUtils.getAuthorities(authentication);
+
+		return authorities.contains("ROLE_ADMIN") ? "/accounts" : "/restaurants";
 	}
 }

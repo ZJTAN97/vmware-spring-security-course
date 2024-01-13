@@ -21,6 +21,8 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests(requests ->
 				requests.anyRequest().authenticated())
+				.oauth2Login(withDefaults())
+//				.oauth2Client(withDefaults())
 			.logout(withDefaults());
 			
 		return http.build();
@@ -31,7 +33,8 @@ public class SecurityConfig {
 		ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2Client =
 				new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
 		
-		// TODO set the defaultOAuth2AuthorizedClient 
+		// TODO set the defaultOAuth2AuthorizedClient
+		oauth2Client.setDefaultOAuth2AuthorizedClient(true);
 
 		return WebClient.builder()
 				.apply(oauth2Client.oauth2Configuration())

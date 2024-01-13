@@ -14,27 +14,27 @@ public class BCryptStrengthTester {
 	
 	private static final int TARGET_HASHING_TIME = 1000;
 	
-	private static final int MIN_STRENGHT = 4;
+	private static final int MIN_strength = 4;
 	
-	private static final int MAX_STRENGHT = 31;
+	private static final int MAX_strength = 31;
 
 	private static final String PASSWORD = "s3cureP4ssword#";
 	
 	
 	public static int startTest() {
-		int strenght = MIN_STRENGHT - 1;
+		int strength = MIN_strength - 1;
 		Duration timeElapsed = Duration.ZERO;
 		
-		while(++strenght < MAX_STRENGHT && timeElapsed.toMillis() < TARGET_HASHING_TIME) {
-			var bcrypt = new BCryptPasswordEncoder(strenght);
+		while(++strength < MAX_strength && timeElapsed.toMillis() < TARGET_HASHING_TIME) {
+			var bcrypt = new BCryptPasswordEncoder(strength);
 			
 			Instant start = Instant.now();
 			bcrypt.encode(PASSWORD);
 			timeElapsed = Duration.between(start, Instant.now()); 
 			
-			logger.info("BCrypt with strenght {} took {} millis", strenght, timeElapsed.toMillis());
+			logger.info("BCrypt with strength {} took {} millis", strength, timeElapsed.toMillis());
 		}
 		
-		return strenght;
+		return strength;
 	}
 }

@@ -22,7 +22,9 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JwtOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 	
 	private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
@@ -33,8 +35,8 @@ public class JwtOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
     private JwtDecoder jwtDecoder = new NimbusJwtDecoder(new ParseOnlyJWTProcessor());
 
 	
-    public JwtOpaqueTokenIntrospector(OAuth2ResourceServerProperties oAuth2ResourceServerProperties) {
-		this.jwtGrantedAuthoritiesConverter = null;
+    public JwtOpaqueTokenIntrospector(OAuth2ResourceServerProperties oAuth2ResourceServerProperties, JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
+		this.jwtGrantedAuthoritiesConverter = jwtGrantedAuthoritiesConverter;
 		
 		OAuth2ResourceServerProperties.Opaquetoken opaqueToken = oAuth2ResourceServerProperties.getOpaquetoken();
 		delegate = new NimbusOpaqueTokenIntrospector(opaqueToken.getIntrospectionUri(), opaqueToken.getClientId(),
@@ -46,7 +48,7 @@ public class JwtOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
         OAuth2AuthenticatedPrincipal principal = this.delegate.introspect(token);
         try {
             Jwt jwt = this.jwtDecoder.decode(token);
-            Collection<GrantedAuthority> authorities = null;
+            Collection<GrantedAuthority> authorities = jwtGrantedAuthoritiesConverter.convert(jwt);
             return new DefaultOAuth2AuthenticatedPrincipal(jwt.getClaims(), authorities);
         } catch (JwtException ex) {
             throw new OAuth2IntrospectionException(ex.getMessage());

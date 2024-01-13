@@ -27,8 +27,14 @@ public class RestaurantOwnerAuthorizationManager implements AuthorizationManager
 		Authentication authentication = auth.get();
 		
 		Set<String> userAuthorities = SecurityUtils.getAuthorities(authentication);
+		if(userAuthorities.contains("ROLE_ADMIN")) {
+			return new AuthorizationDecision(true);
+		} else {
+			boolean granted = restaurantManager.findById(restaurantId)
+					.map(restaurant -> authentication.getName().equals(restaurant.getOwner().getUsername()))
+					.orElse(false);
 
-			
-		return null;
+			return new AuthorizationDecision(granted);
+		}
 	}
 }

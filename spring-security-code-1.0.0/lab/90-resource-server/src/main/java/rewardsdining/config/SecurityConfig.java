@@ -17,7 +17,9 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests(requests -> requests
-				.anyRequest().authenticated());
+						.mvcMatchers("/rewards/**").hasRole("ADMIN")
+						.anyRequest().authenticated())
+				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::opaqueToken);
 		return http.build();
 	}
 	
@@ -32,6 +34,9 @@ public class SecurityConfig {
 		var jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 		
 		// TODO set the prefix and the authorities claim name
+
+		jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+		jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
 		
 		return jwtGrantedAuthoritiesConverter;
 	}

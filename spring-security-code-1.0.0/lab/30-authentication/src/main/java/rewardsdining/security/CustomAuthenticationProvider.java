@@ -8,10 +8,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import rewardsdining.account.data.AccountRepository;
 
+@Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	private final CustomUserDetailsService userDetailsService;
@@ -27,14 +29,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		
-		String username = null; // Obtain the user name from the Authentication object
+		String username = authentication.getName(); // Obtain the user name from the Authentication object
 		
-		String password = null; // Obtain the password from the Authentication object
+		String password = authentication.getCredentials().toString(); // Obtain the password from the Authentication object
 		
 		try {
-			UserDetails user = null; // Use the UserDetailsService to load the user.
+			UserDetails user = userDetailsService.loadUserByUsername(username); // Use the UserDetailsService to load the user.
 			
-			if(true) { // Use the password encoder to check if the provided password matches with the user password (use the match method)
+			if(passwordEncoder.matches(password, user.getPassword())) { // Use the password encoder to check if the provided password matches with the user password (use the match method)
 				return new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
 			} else {
 				throw new BadCredentialsException("Bad Credentials");

@@ -31,11 +31,12 @@ import rewardsdining.security.CustomOAuth2UserService;
 public class SecurityConfig {
 	
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuth2UserService customOAuth2UserService) throws Exception {
 		http.authorizeRequests(requests ->
 				requests.anyRequest().authenticated())
-		.formLogin(withDefaults());
-		
+		.formLogin(withDefaults())
+				.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)));
+
 		return http.build();
 	}
 	
@@ -45,4 +46,5 @@ public class SecurityConfig {
 				.requestMatchers(PathRequest.toStaticResources().atCommonLocations())
 				.antMatchers("/h2-console/**");
 	}
+
 }

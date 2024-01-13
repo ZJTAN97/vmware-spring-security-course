@@ -5,11 +5,13 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import rewardsdining.account.Account;
 import rewardsdining.account.data.AccountRepository;
 
+@Component
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 	private final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
@@ -25,8 +27,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
-        
-        return null;
+
+		return accountRepository.findByUsername(oAuth2User.getName())
+				.map(account -> AccountUserDetails.from(account, oAuth2User))
+				.orElseGet(() -> createAccount(oAuth2User));
     }
   
     private AccountUserDetails createAccount(OAuth2User oauth2User) {

@@ -15,5 +15,11 @@ public class RestaurantAuthorizer {
 		this.restaurantManager = restaurantManager;
 	}
 
+	public boolean isOwner(Authentication authentication, long restaurantId) {
+		return restaurantManager.findById(restaurantId).
+				map(restaurant -> authentication.getName().equals(restaurant.getOwner().getUsername()))
+				.orElse(false);
+	}
+
 	
 }

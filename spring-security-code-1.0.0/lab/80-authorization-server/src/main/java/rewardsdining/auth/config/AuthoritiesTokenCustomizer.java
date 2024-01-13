@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.server.authorization.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenCustomizer;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AuthoritiesTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 	
 	private static final String AUTHORITIES_CLAIM = "authorities";
@@ -20,6 +22,10 @@ public class AuthoritiesTokenCustomizer implements OAuth2TokenCustomizer<JwtEnco
 	
 	@Override
 	public void customize(JwtEncodingContext context) {
+
+		var authorities = getAuthoritySet(context);
+
+		context.getClaims().claim(AUTHORITIES_CLAIM, authorities);
 
 	}
 	

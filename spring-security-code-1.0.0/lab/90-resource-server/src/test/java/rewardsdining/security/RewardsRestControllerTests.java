@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.test.web.servlet.MockMvc;
 
+import rewardsdining.config.SecurityConfig;
 import rewardsdining.reward.RewardNetwork;
 import rewardsdining.reward.web.RewardsRestController;
 
